@@ -25,6 +25,15 @@ public class VehicleRepoServiceImpl implements VehicleRepoService {
     }
 
     @Override
+    public void getAllAvailableVehicles() {
+        for (Vehicle vehicle : vehicleRepo.getAll()) {
+            if (!vehicle.isRented()) {
+                System.out.println(vehicle);
+            }
+        }
+    }
+
+    @Override
     public void rentVehicle(int id) {
         Vehicle vehicle = vehicleRepo.getVehicleById(id);
         vehicle.setRented(true);

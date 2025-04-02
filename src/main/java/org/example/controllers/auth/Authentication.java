@@ -39,8 +39,17 @@ public class Authentication {
             return null;
         }
         String password = getUserInput("Enter your password: ");
-        String role = getUserInput("Enter your role (admin/user): ").toLowerCase();
-
+        String role = getUserInput("Enter your role (admin/user): ").toUpperCase();
+        if (role.equals("ADMIN")) {
+            String adminPassword = getUserInput("Enter admin password: ");
+            if (adminPassword.equals("admin")) {
+                User newUser = new User(login, hashPassword(password), role);
+                userService.getUserRepo().add(newUser);
+            } else {
+                System.out.println("Invalid password. Please try again.");
+                return null;
+            }
+        }
         User newUser = new User(login, hashPassword(password), role);
         userService.getUserRepo().add(newUser);
         currentUser = newUser;

@@ -1,7 +1,13 @@
 package org.example.models;
 
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.ToString;
 import org.example.models.abstractions.Vehicle;
 
+@EqualsAndHashCode(callSuper = true)
+@Data
+@ToString(callSuper = true)
 public class Motorcycle extends Vehicle {
     private String category;
 
@@ -15,17 +21,9 @@ public class Motorcycle extends Vehicle {
         this.category = category;
     }
 
-    public String getCategory() {
-        return category;
-    }
-
-    public void setCategory(String category) {
-        this.category = category;
-    }
-
     @Override
     public String toCsv() {
-        return super.toCsv() + "," + category; // Однаковий формат CSV
+        return super.toCsv() + "," + category;
     }
 
     @Override
@@ -33,16 +31,4 @@ public class Motorcycle extends Vehicle {
         return new Motorcycle(getId(), getBrand(), getModel(), getYear(), getPrice(), isRented(), getCategory());
     }
 
-    @Override
-    public String toString() {
-        return "Motorcycle{" +
-                "id=" + getId() +
-                ", brand='" + getBrand() + '\'' +
-                ", model='" + getModel() + '\'' +
-                ", year=" + getYear() +
-                ", price=" + getPrice() +
-                ", rented=" + isRented() +
-                ", category='" + category + '\'' +
-                '}';
-    }
 }

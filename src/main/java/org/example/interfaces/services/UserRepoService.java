@@ -4,4 +4,5 @@ import org.example.interfaces.repositories.UserRepo;
 
 public interface UserRepoService {
     void printAllUsers();
-    UserRepo getUserRepo();}
+    UserRepo getUserRepo();
+}

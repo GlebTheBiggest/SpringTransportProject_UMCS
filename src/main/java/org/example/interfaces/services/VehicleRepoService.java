@@ -7,4 +7,5 @@ public interface VehicleRepoService {
     void rentVehicle(int id);
     void returnVehicle(int id);
     VehicleRepo getVehicleRepo();
+    void getAllAvailableVehicles();
 }

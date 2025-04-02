@@ -27,25 +27,20 @@ public class ConsoleController {
 
     public static void console() {
         System.out.println("Hello World!");
-        char operator = 'd';
+        char operator;
         while (true) {
-            if (operator == 'd') {
-                operator = getOperatorInput("'q' - exit the program\n" +
-                                            "'r' - register\n" +
-                                            "'l' - login\n" +
-                                            "Enter your operator: ", new char[]{'q', 'r', 'l'});
-            }
+            operator = getOperatorInput("Guest MENU\n " +
+                                        "'q' - exit the program\n" +
+                                        "'r' - register\n" +
+                                        "'l' - login\n" +
+                                        "Enter your operator: ", new char[]{'q', 'r', 'l'});
             if (operator == 'q') break;
-
             USER = (operator == 'r') ? auth.register() : auth.login();
-
             if (USER != null) {
-                if (USER.getRole().equalsIgnoreCase("admin")) adminAction();
+                if (USER.getRole().equalsIgnoreCase("ADMIN")) adminAction();
                 else userAction();
-            } else {
-                operator = 'd';
             }
-
+            scanner.nextLine();
         }
         System.out.println("Exiting...");
     }
@@ -115,6 +110,12 @@ public class ConsoleController {
     }
 
     private static void rentVehicle() {
+        if (vehicleService.getVehicleRepo().getAll().isEmpty()) {
+            System.out.println("There are no vehicles available!");
+            return;
+        }
+        System.out.println("Available vehicles: \n");
+        vehicleService.getAllAvailableVehicles();
         if (USER.getVehicleId() != 0) {
             System.out.println("You have already rented a vehicle (ID: " + USER.getVehicleId() + "). Return it first.");
             return;
