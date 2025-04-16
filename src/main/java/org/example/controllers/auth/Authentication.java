@@ -5,12 +5,12 @@ import org.example.models.User;
 
 import java.util.Scanner;
 
+import static org.example.security.IdGenerator.generateId;
 import static org.example.security.PasswordHasher.hashPassword;
 
 public class Authentication {
     private final Scanner scanner;
     private final UserRepoService userService;
-    private User currentUser;
 
     public Authentication(Scanner scanner, UserRepoService userService) {
         this.scanner = scanner;
@@ -22,9 +22,8 @@ public class Authentication {
         String password = getUserInput("Enter your password: ");
 
         for (User user : userService.getUserRepo().getAll()) {
-            if (login.equals(user.getLogin()) && hashPassword(password).equals(user.getHashPassword())) {
+            if (login.equals(user.getLogin()) && hashPassword(password).equals(user.getPassword())) {
                 System.out.println("Login successful!");
-                currentUser = user;
                 return user;
             }
         }
@@ -33,8 +32,9 @@ public class Authentication {
     }
 
     public User register() {
+        String id = generateId();
         String login = getUserInput("Enter your login: ");
-        if (userService.getUserRepo().getAll().stream().anyMatch(u -> u.getLogin().equals(login))) {
+        if (userService.getUserRepo().getUserById(login) != null) {
             System.out.println("This login is already taken. Please try again.");
             return null;
         }
@@ -43,16 +43,15 @@ public class Authentication {
         if (role.equals("ADMIN")) {
             String adminPassword = getUserInput("Enter admin password: ");
             if (adminPassword.equals("admin")) {
-                User newUser = new User(login, hashPassword(password), role);
+                User newUser = new User(id, login, hashPassword(password), role);
                 userService.getUserRepo().add(newUser);
             } else {
                 System.out.println("Invalid password. Please try again.");
                 return null;
             }
         }
-        User newUser = new User(login, hashPassword(password), role);
+        User newUser = new User(id, login, hashPassword(password), role);
         userService.getUserRepo().add(newUser);
-        currentUser = newUser;
         return newUser;
     }
 

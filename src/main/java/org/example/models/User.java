@@ -4,29 +4,23 @@ import lombok.Data;
 
 @Data
 public class User {
-    private int id;
-    private int vehicleId;
+    private String id;
     private String login;
-    private String hashPassword;
+    private String password;
     private String role;
 
-    public User(int id, int vehicleId, String login, String hashPassword, String role) {
+    public User(String id, String login, String password, String role) {
         this.id = id;
-        this.vehicleId = vehicleId;
         this.login = login;
-        this.hashPassword = hashPassword;
+        this.password = password;
         this.role = role;
     }
 
-    public User(String login, String hashPassword, String role) {
-        this(0, 0, login, hashPassword, role);
-    }
-
     public String toCsv() {
-        return id + "," + vehicleId + "," + login + "," + hashPassword + "," + role; // Використовуємо кому
+        return id + "," + login + "," + password + "," + role;
     }
 
     public User cloneUser() {
-        return new User(id, vehicleId, login, hashPassword, role);
+        return new User(id, login, password, role);
     }
 }

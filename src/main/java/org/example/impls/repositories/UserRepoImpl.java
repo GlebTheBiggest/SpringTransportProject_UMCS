@@ -9,7 +9,6 @@ import java.util.*;
 
 public class UserRepoImpl implements UserRepo {
     private final List<User> users;
-    private int id = 0;
     private static final String FILE_NAME = "users.csv";
 
     public UserRepoImpl() {
@@ -38,28 +37,32 @@ public class UserRepoImpl implements UserRepo {
     }
 
     @Override
-    public User getUserById(int id) {
+    public User getUserById(String id) {
         return this.users.stream()
-                .filter(user -> user.getId() == id)
+                .filter(user -> user.getId().equals(id))
                 .findFirst()
                 .orElse(null);
     }
 
     @Override
-    public void add(User user) {
-        if (user.getId() == 0) {
-            user.setId(++id);
+    public boolean add(User user) {
+        for (User u : this.users) {
+            if (user.getId().equals(u.getId())) {
+                return false;
+            }
         }
         this.users.add(user);
         save();
+        return true;
     }
 
     @Override
-    public void delete(int id) {
-        boolean removed = this.users.removeIf(user -> user.getId() == id);
+    public boolean remove(String id) {
+        boolean removed = this.users.removeIf(user -> user.getId().equals(id));
         if (removed) {
             save();
         }
+        return removed;
     }
 
     @Override
@@ -82,35 +85,26 @@ public class UserRepoImpl implements UserRepo {
 
     public void read() {
         Path path = Paths.get(FILE_NAME);
-        int idLargest = 0;
         try (Scanner input = new Scanner(path, StandardCharsets.UTF_8)) {
             while (input.hasNextLine()) {
                 String line = input.nextLine().trim();
                 if (line.isEmpty()) continue;
 
                 String[] data = line.split(",");
-                if (data.length < 5) {
+                if (data.length < 4) {
                     System.err.println("Invalid data format: " + line);
                     continue;
                 }
-
                 try {
-                    int id = Integer.parseInt(data[0]);
-                    int vehicleId = Integer.parseInt(data[1]);
-                    String name = data[2];
-                    String password = data[3];
-                    String role = data[4];
-
-                    users.add(new User(id, vehicleId, name, password, role));
-
-                    if (id > idLargest) {
-                        idLargest = id;
-                    }
+                    String id = data[0];
+                    String name = data[1];
+                    String password = data[2];
+                    String role = data[3];
+                    users.add(new User(id, name, password, role));
                 } catch (NumberFormatException e) {
                     System.err.println("Skipping invalid line: " + line);
                 }
             }
-            this.id = idLargest;
         } catch (IOException e) {
             System.err.println("Error reading file: " + e.getMessage());
         }

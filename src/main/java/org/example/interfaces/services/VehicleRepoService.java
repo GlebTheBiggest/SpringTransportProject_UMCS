@@ -1,11 +1,13 @@
 package org.example.interfaces.services;
 
+import org.example.interfaces.repositories.RentalRepo;
 import org.example.interfaces.repositories.VehicleRepo;
+import org.example.models.Vehicle;
+
+import java.util.List;
 
 public interface VehicleRepoService {
     void printAllVehicles();
-    void rentVehicle(int id);
-    void returnVehicle(int id);
     VehicleRepo getVehicleRepo();
-    void getAllAvailableVehicles();
+    List<Vehicle> getAllAvailableVehicles(RentalRepo rentalRepo);
 }

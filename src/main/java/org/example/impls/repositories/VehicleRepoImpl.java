@@ -1,9 +1,7 @@
 package org.example.impls.repositories;
 
 import org.example.interfaces.repositories.VehicleRepo;
-import org.example.models.Car;
-import org.example.models.Motorcycle;
-import org.example.models.abstractions.Vehicle;
+import org.example.models.Vehicle;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
@@ -12,7 +10,6 @@ import java.util.*;
 
 public class VehicleRepoImpl implements VehicleRepo {
     private final List<Vehicle> vehicles;
-    private int id = 0;
     private static final String FILE_NAME = "vehicles.csv";
 
     public VehicleRepoImpl() {
@@ -33,28 +30,29 @@ public class VehicleRepoImpl implements VehicleRepo {
     }
 
     @Override
-    public Vehicle getVehicleById(int id) {
+    public Vehicle getVehicleById(String id) {
         return this.vehicles.stream()
-                .filter(v -> v.getId() == id)
+                .filter(v -> v.getId().equals(id))
                 .findFirst()
                 .orElse(null);
     }
 
     @Override
-    public void add(Vehicle vehicle) {
-        if (vehicle.getId() == 0) {
-            vehicle.setId(++id);
+    public boolean add(Vehicle vehicle) {
+        if (vehicle.getId() == null || vehicle.getId().isEmpty()) {
+            vehicle.setId(UUID.randomUUID().toString());
         }
         this.vehicles.add(vehicle);
-        save();
+        return save();
     }
 
     @Override
-    public void delete(int id) {
-        boolean removed = this.vehicles.removeIf(v -> v.getId() == id);
+    public boolean delete(String id) {
+        boolean removed = this.vehicles.removeIf(v -> v.getId().equals(id));
         if (removed) {
-            save();
+            return save();
         }
+        return false;
     }
 
     @Override
@@ -63,7 +61,7 @@ public class VehicleRepoImpl implements VehicleRepo {
         Path file = Paths.get(FILE_NAME);
 
         for (Vehicle v : this.vehicles) {
-            lines.add((v instanceof Car ? "Car:" : "Motorcycle:") + v.toCsv());
+            lines.add(v.toCsv());
         }
         try {
             Files.write(file, lines, StandardCharsets.UTF_8, StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING);
@@ -74,50 +72,49 @@ public class VehicleRepoImpl implements VehicleRepo {
         return true;
     }
 
+    @Override
     public void read() {
         Path path = Paths.get(FILE_NAME);
-        int idLargest = 0;
 
         try (Scanner input = new Scanner(path, StandardCharsets.UTF_8)) {
             while (input.hasNextLine()) {
                 String line = input.nextLine().trim();
                 if (line.isEmpty()) continue;
 
-                String[] parts = line.split(":");
-                if (parts.length < 2) {
+                String[] data = line.split(",");
+                if (data.length < 7) {
                     System.err.println("Invalid format: " + line);
                     continue;
                 }
-                String type = parts[0];
-                String[] data = parts[1].split(",");
                 try {
-                    int id = Integer.parseInt(data[0]);
-                    String brand = data[1];
-                    String model = data[2];
-                    int year = Integer.parseInt(data[3]);
-                    int price = Integer.parseInt(data[4]);
-                    boolean isRented = Boolean.parseBoolean(data[5]);
+                    String id = data[0];
+                    String category = data[1];
+                    String brand = data[2];
+                    String model = data[3];
+                    int year = Integer.parseInt(data[4]);
+                    String plate = data[5];
+                    double price = Double.parseDouble(data[6]);
+                    Map<String, Object> attributes = parseAttributes(data[7]);
 
-                    if (id > idLargest) {
-                        idLargest = id;
-                    }
-
-                    if (type.equals("Car") && data.length == 6) {
-                        vehicles.add(new Car(id, brand, model, year, price, isRented));
-                    } else if (type.equals("Motorcycle") && data.length == 7) {
-                        String category = data[6];
-                        vehicles.add(new Motorcycle(id, brand, model, year, price, isRented, category));
-                    } else {
-                        System.err.println("Skipping invalid vehicle: " + line);
-                    }
-
-                } catch (NumberFormatException e) {
+                    vehicles.add(new Vehicle(id, category, brand, model, year, plate, price, attributes));
+                } catch (NumberFormatException | ArrayIndexOutOfBoundsException e) {
                     System.err.println("Error parsing vehicle: " + line);
                 }
             }
-            this.id = idLargest;
         } catch (IOException e) {
             System.err.println("Error reading file: " + e.getMessage());
         }
+    }
+
+    private Map<String, Object> parseAttributes(String attributesString) {
+        Map<String, Object> attributes = new HashMap<>();
+        String[] entries = attributesString.split(";");
+        for (String entry : entries) {
+            String[] keyValue = entry.split("=");
+            if (keyValue.length == 2) {
+                attributes.put(keyValue[0], keyValue[1]);
+            }
+        }
+        return attributes;
     }
 }

@@ -4,11 +4,11 @@ import org.example.models.Rental;
 import java.util.List;
 
 public interface RentalRepo {
-    void remove(int id);
+    boolean remove(String id);
     List<Rental> getAll();
-    Rental getById(int id);
-    void add(Rental rental);
+    Rental getById(String id);
+    boolean add(Rental rental);
     boolean save();
     void read();
-    List<Rental> getByUserId(int userId);
+    List<Rental> getByUserId(String userId);
 }

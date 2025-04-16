@@ -6,9 +6,9 @@ import java.util.List;
 
 public interface UserRepo {
     List<User> getAll();
-    User getUserById(int id);
-    void add(User user);
-    void delete(int id);
+    User getUserById(String id);
+    boolean add(User user);
+    boolean remove(String id);
     boolean save();
     void read();
     User getByLogin(String login);

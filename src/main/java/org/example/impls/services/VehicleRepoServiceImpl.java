@@ -1,8 +1,13 @@
 package org.example.impls.services;
 
+import org.example.interfaces.repositories.RentalRepo;
 import org.example.interfaces.repositories.VehicleRepo;
 import org.example.interfaces.services.VehicleRepoService;
-import org.example.models.abstractions.Vehicle;
+import org.example.models.Rental;
+import org.example.models.Vehicle;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class VehicleRepoServiceImpl implements VehicleRepoService {
     private final VehicleRepo vehicleRepo;
@@ -25,25 +30,15 @@ public class VehicleRepoServiceImpl implements VehicleRepoService {
     }
 
     @Override
-    public void getAllAvailableVehicles() {
+    public List<Vehicle> getAllAvailableVehicles(RentalRepo rentalRepo) {
+        List<Vehicle> vehicles = new ArrayList<>();
         for (Vehicle vehicle : vehicleRepo.getAll()) {
-            if (!vehicle.isRented()) {
-                System.out.println(vehicle);
+            for (Rental rental : rentalRepo.getAll()) {
+                if (!vehicle.getId().equals(rental.getId())) {
+                    vehicles.add(vehicle);
+                }
             }
         }
-    }
-
-    @Override
-    public void rentVehicle(int id) {
-        Vehicle vehicle = vehicleRepo.getVehicleById(id);
-        vehicle.setRented(true);
-        vehicleRepo.save();
-    }
-
-    @Override
-    public void returnVehicle(int id) {
-        Vehicle vehicle = vehicleRepo.getVehicleById(id);
-        vehicle.setRented(false);
-        vehicleRepo.save();
+        return vehicles;
     }
 }
