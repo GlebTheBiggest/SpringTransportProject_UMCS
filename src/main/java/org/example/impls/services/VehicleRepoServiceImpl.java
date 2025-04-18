@@ -21,7 +21,11 @@ public class VehicleRepoServiceImpl implements VehicleRepoService {
 
     @Override
     public void printAllVehicles() {
-        vehicleRepo.getAll().forEach(System.out::println);
+        if (vehicleRepo.getAll().isEmpty()) {
+            System.out.println("No vehicles found!");
+        } else {
+            vehicleRepo.getAll().forEach(System.out::println);
+        }
     }
 
     @Override
@@ -32,9 +36,12 @@ public class VehicleRepoServiceImpl implements VehicleRepoService {
     @Override
     public List<Vehicle> getAllAvailableVehicles(RentalRepo rentalRepo) {
         List<Vehicle> vehicles = new ArrayList<>();
+        if (rentalRepo.getAll().isEmpty() && !vehicleRepo.getAll().isEmpty()) {
+            vehicles.addAll(vehicleRepo.getAll());
+        }
         for (Vehicle vehicle : vehicleRepo.getAll()) {
             for (Rental rental : rentalRepo.getAll()) {
-                if (!vehicle.getId().equals(rental.getId())) {
+                if (!vehicle.getId().equals(rental.getVehicleId())) {
                     vehicles.add(vehicle);
                 }
             }

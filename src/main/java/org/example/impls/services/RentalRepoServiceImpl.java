@@ -18,7 +18,11 @@ public class RentalRepoServiceImpl implements RentalRepoService {
 
     @Override
     public void printAllRentals() {
-        this.rentalRepo.getAll().forEach(System.out::println);
+        if (rentalRepo.getAll().isEmpty()) {
+            System.out.println("No rentals found!");
+        } else {
+            this.rentalRepo.getAll().forEach(System.out::println);
+        }
     }
 
     @Override

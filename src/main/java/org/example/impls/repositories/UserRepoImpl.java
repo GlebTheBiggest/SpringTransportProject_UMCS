@@ -1,5 +1,7 @@
 package org.example.impls.repositories;
 
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.example.interfaces.repositories.UserRepo;
 import org.example.models.User;
 import java.io.IOException;
@@ -9,13 +11,14 @@ import java.util.*;
 
 public class UserRepoImpl implements UserRepo {
     private final List<User> users;
-    private static final String FILE_NAME = "users.csv";
+    private static final String CSV_FILE_NAME = "users.csv";
+    private static final String JSON_FILE_NAME = "users.json";
 
     public UserRepoImpl() {
         this.users = new ArrayList<>();
-        Path path = Paths.get(FILE_NAME);
+        Path path = Paths.get(JSON_FILE_NAME);
         if (Files.exists(path)) {
-            read();
+            readJson();
         }
     }
 
@@ -52,26 +55,28 @@ public class UserRepoImpl implements UserRepo {
             }
         }
         this.users.add(user);
-        save();
         return true;
     }
 
     @Override
     public boolean remove(String id) {
-        boolean removed = this.users.removeIf(user -> user.getId().equals(id));
-        if (removed) {
-            save();
-        }
-        return removed;
+        return this.users.removeIf(user -> user.getId().equals(id));
     }
 
     @Override
-    public boolean save() {
-        Path file = Paths.get(FILE_NAME);
+    public boolean saveCsv() {
         List<String> lines = new ArrayList<>();
+        Path file = Paths.get(CSV_FILE_NAME);
 
         for (User user : this.users) {
-            lines.add(user.toCsv());
+            StringBuilder sb = new StringBuilder();
+            sb.append("User(")
+                    .append("id=").append(user.getId()).append("; ")
+                    .append("name=").append(user.getLogin()).append("; ")
+                    .append("password=").append(user.getPassword()).append("; ")
+                    .append("role=").append(user.getRole())
+                    .append(")");
+            lines.add(sb.toString());
         }
 
         try {
@@ -83,30 +88,81 @@ public class UserRepoImpl implements UserRepo {
         return true;
     }
 
-    public void read() {
-        Path path = Paths.get(FILE_NAME);
+    @Override
+    public void readCsv() {
+        Path path = Paths.get(CSV_FILE_NAME);
+
         try (Scanner input = new Scanner(path, StandardCharsets.UTF_8)) {
             while (input.hasNextLine()) {
                 String line = input.nextLine().trim();
                 if (line.isEmpty()) continue;
 
-                String[] data = line.split(",");
-                if (data.length < 4) {
-                    System.err.println("Invalid data format: " + line);
-                    continue;
-                }
                 try {
-                    String id = data[0];
-                    String name = data[1];
-                    String password = data[2];
-                    String role = data[3];
+                    if (!line.startsWith("User(") || !line.endsWith(")")) {
+                        System.err.println("Invalid format: " + line);
+                        continue;
+                    }
+
+                    line = line.substring(5, line.length() - 1); // Видаляємо "User(" та ")"
+                    String[] parts = line.split("; ");
+                    String id = null, name = null, password = null, role = null;
+
+                    for (String part : parts) {
+                        String[] keyValue = part.split("=", 2);
+                        if (keyValue.length != 2) {
+                            System.err.println("Invalid key-value format: " + part);
+                            continue;
+                        }
+
+                        String key = keyValue[0].trim();
+                        String value = keyValue[1].trim();
+
+                        switch (key) {
+                            case "id" -> id = value;
+                            case "name" -> name = value;
+                            case "password" -> password = value;
+                            case "role" -> role = value;
+                        }
+                    }
+
                     users.add(new User(id, name, password, role));
-                } catch (NumberFormatException e) {
-                    System.err.println("Skipping invalid line: " + line);
+                } catch (Exception e) {
+                    System.err.println("Error parsing user: " + line + ", reason: " + e.getMessage());
                 }
             }
         } catch (IOException e) {
             System.err.println("Error reading file: " + e.getMessage());
         }
     }
+
+    @Override
+    public boolean saveJson() {
+        Path file = Paths.get(JSON_FILE_NAME);
+        ObjectMapper objectMapper = new ObjectMapper();
+
+        try {
+            objectMapper.writeValue(file.toFile(), this.users);
+        } catch (IOException e) {
+            System.err.println("Error saving JSON file: " + e.getMessage());
+            return false;
+        }
+        return true;
+    }
+
+    @Override
+    public void readJson() {
+        Path path = Paths.get(JSON_FILE_NAME);
+        ObjectMapper objectMapper = new ObjectMapper();
+
+        try {
+            List<User> loadedUsers = objectMapper.readValue(path.toFile(), new TypeReference<List<User>>() {});
+            this.users.clear();
+            this.users.addAll(loadedUsers);
+        } catch (IOException e) {
+            System.err.println("Error reading JSON file: " + e.getMessage());
+        } catch (Exception e) {
+            System.err.println("Unexpected error: " + e.getMessage());
+        }
+    }
+
 }

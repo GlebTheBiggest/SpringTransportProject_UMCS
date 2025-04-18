@@ -20,7 +20,10 @@ public class UserRepoServiceImpl implements UserRepoService {
 
     @Override
     public void printAllUsers() {
-        userRepo.getAll().forEach(System.out::println);
-
+        if (userRepo.getAll().isEmpty()) {
+            System.out.println("No users found!");
+        } else {
+            userRepo.getAll().forEach(System.out::println);
+        }
     }
 }

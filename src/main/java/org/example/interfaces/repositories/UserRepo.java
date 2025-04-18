@@ -9,7 +9,9 @@ public interface UserRepo {
     User getUserById(String id);
     boolean add(User user);
     boolean remove(String id);
-    boolean save();
-    void read();
+    boolean saveCsv();
+    void readCsv();
     User getByLogin(String login);
+    boolean saveJson();
+    void readJson();
 }

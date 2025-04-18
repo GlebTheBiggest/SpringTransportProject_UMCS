@@ -8,6 +8,8 @@ public interface VehicleRepo {
     Vehicle getVehicleById(String id);
     boolean add(Vehicle vehicle);
     boolean delete(String id);
-    boolean save();
-    void read();
+    boolean saveCsv();
+    void readCsv();
+    boolean saveJson();
+    void readJson();
 }

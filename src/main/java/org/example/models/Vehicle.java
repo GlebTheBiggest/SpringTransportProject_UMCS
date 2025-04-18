@@ -48,7 +48,7 @@ public class Vehicle {
             attrBuilder.append(entry.getKey()).append("=").append(entry.getValue()).append(";");
         }
         if (!attrBuilder.isEmpty()) {
-            attrBuilder.setLength(attrBuilder.length() - 1);
+            attrBuilder.append("{}");
         }
 
         return String.join(",",

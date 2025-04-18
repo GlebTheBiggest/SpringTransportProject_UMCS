@@ -5,15 +5,15 @@ import org.example.models.User;
 
 import java.util.Scanner;
 
+import static org.example.impls.services.InputService.getUserInput;
+import static org.example.security.Hasher.checkString;
 import static org.example.security.IdGenerator.generateId;
-import static org.example.security.PasswordHasher.hashPassword;
+import static org.example.security.Hasher.hashString;
 
 public class Authentication {
-    private final Scanner scanner;
     private final UserRepoService userService;
 
-    public Authentication(Scanner scanner, UserRepoService userService) {
-        this.scanner = scanner;
+    public Authentication(UserRepoService userService) {
         this.userService = userService;
     }
 
@@ -22,7 +22,7 @@ public class Authentication {
         String password = getUserInput("Enter your password: ");
 
         for (User user : userService.getUserRepo().getAll()) {
-            if (login.equals(user.getLogin()) && hashPassword(password).equals(user.getPassword())) {
+            if (login.equals(user.getLogin()) && checkString(password, user.getPassword())) {
                 System.out.println("Login successful!");
                 return user;
             }
@@ -34,7 +34,7 @@ public class Authentication {
     public User register() {
         String id = generateId();
         String login = getUserInput("Enter your login: ");
-        if (userService.getUserRepo().getUserById(login) != null) {
+        if (userService.getUserRepo().getByLogin(login) != null) {
             System.out.println("This login is already taken. Please try again.");
             return null;
         }
@@ -43,20 +43,15 @@ public class Authentication {
         if (role.equals("ADMIN")) {
             String adminPassword = getUserInput("Enter admin password: ");
             if (adminPassword.equals("admin")) {
-                User newUser = new User(id, login, hashPassword(password), role);
+                User newUser = new User(id, login, hashString(password), role);
                 userService.getUserRepo().add(newUser);
             } else {
                 System.out.println("Invalid password. Please try again.");
                 return null;
             }
         }
-        User newUser = new User(id, login, hashPassword(password), role);
+        User newUser = new User(id, login, hashString(password), role);
         userService.getUserRepo().add(newUser);
         return newUser;
-    }
-
-    private String getUserInput(String message) {
-        System.out.print(message);
-        return scanner.next();
     }
 }
