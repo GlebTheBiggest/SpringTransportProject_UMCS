@@ -5,11 +5,11 @@ import java.util.List;
 
 public interface VehicleRepo {
     List<Vehicle> getAll();
-    Vehicle getVehicleById(String id);
+    Vehicle getById(String id);
     boolean add(Vehicle vehicle);
-    boolean delete(String id);
-    boolean saveCsv();
+    boolean remove(String id);
+    void saveCsv();
     void readCsv();
-    boolean saveJson();
+    void saveJson();
     void readJson();
 }

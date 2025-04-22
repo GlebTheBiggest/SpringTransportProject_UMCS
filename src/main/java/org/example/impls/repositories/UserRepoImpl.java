@@ -40,7 +40,7 @@ public class UserRepoImpl implements UserRepo {
     }
 
     @Override
-    public User getUserById(String id) {
+    public User getById(String id) {
         return this.users.stream()
                 .filter(user -> user.getId().equals(id))
                 .findFirst()
@@ -64,7 +64,7 @@ public class UserRepoImpl implements UserRepo {
     }
 
     @Override
-    public boolean saveCsv() {
+    public void saveCsv() {
         List<String> lines = new ArrayList<>();
         Path file = Paths.get(CSV_FILE_NAME);
 
@@ -83,9 +83,7 @@ public class UserRepoImpl implements UserRepo {
             Files.write(file, lines, StandardCharsets.UTF_8, StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING);
         } catch (IOException e) {
             System.err.println("Error saving file: " + e.getMessage());
-            return false;
         }
-        return true;
     }
 
     @Override
@@ -136,17 +134,15 @@ public class UserRepoImpl implements UserRepo {
     }
 
     @Override
-    public boolean saveJson() {
+    public void saveJson() {
         Path file = Paths.get(JSON_FILE_NAME);
         ObjectMapper objectMapper = new ObjectMapper();
 
         try {
-            objectMapper.writeValue(file.toFile(), this.users);
+            objectMapper.writerWithDefaultPrettyPrinter().writeValue(file.toFile(), this.users);
         } catch (IOException e) {
             System.err.println("Error saving JSON file: " + e.getMessage());
-            return false;
         }
-        return true;
     }
 
     @Override
@@ -155,7 +151,11 @@ public class UserRepoImpl implements UserRepo {
         ObjectMapper objectMapper = new ObjectMapper();
 
         try {
-            List<User> loadedUsers = objectMapper.readValue(path.toFile(), new TypeReference<List<User>>() {});
+            List<User> loadedUsers = objectMapper.readValue(
+                    path.toFile(),
+                    new TypeReference<>() {
+                    }
+            );
             this.users.clear();
             this.users.addAll(loadedUsers);
         } catch (IOException e) {
@@ -164,5 +164,4 @@ public class UserRepoImpl implements UserRepo {
             System.err.println("Unexpected error: " + e.getMessage());
         }
     }
-
 }

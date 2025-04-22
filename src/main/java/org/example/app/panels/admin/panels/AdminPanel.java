@@ -2,13 +2,17 @@ package org.example.app.panels.admin.panels;
 
 import org.example.controllers.auth.Authentication;
 import org.example.impls.services.*;
+import org.example.impls.services.csvService.reading.CsvReadingService;
+import org.example.impls.services.csvService.saving.CsvSavingService;
+import org.example.impls.services.jsonService.reading.JsonReadingService;
+import org.example.impls.services.jsonService.saving.JsonSavingService;
 import org.example.interfaces.services.RentalRepoService;
 import org.example.interfaces.services.UserRepoService;
 import org.example.interfaces.services.VehicleRepoService;
 import org.example.models.User;
 
-import static org.example.impls.services.InputService.confirmAction;
-import static org.example.impls.services.InputService.getOperatorInput;
+import static org.example.impls.services.GlobalSavingService.ifSave;
+import static org.example.impls.services.input.InputService.getOperatorInput;
 
 public class AdminPanel {
     private final User USER;
@@ -88,17 +92,8 @@ public class AdminPanel {
                     System.out.println(USER.toString());
                 }
                 case 'q' -> {
-                    if (confirmAction("Do you want to save changes (yes/no)?: ")) {
-                        operator = getOperatorInput("1 - Save in .csv \n" +
-                                                    "2 - Save in .json", new char[]{'1', '2'} );
-                        if (operator == '1') {
-                            new CsvSavingService(userService, vehicleService, rentalService).saveCsv();
-                            System.out.println("Data has been saved in .csv successfully!");
-                        } else {
-                            new JsonSavingService(userService, vehicleService, rentalService).saveJson();
-                            System.out.println("Data has been saved in .json successfully!");
-                        }
-                    }
+                    ifSave();
+                    System.out.println("Logging out...");
                     return;
                 }
             }

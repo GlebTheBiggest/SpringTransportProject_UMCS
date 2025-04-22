@@ -3,9 +3,7 @@ package org.example.controllers.auth;
 import org.example.interfaces.services.UserRepoService;
 import org.example.models.User;
 
-import java.util.Scanner;
-
-import static org.example.impls.services.InputService.getUserInput;
+import static org.example.impls.services.input.InputService.getUserInput;
 import static org.example.security.Hasher.checkString;
 import static org.example.security.IdGenerator.generateId;
 import static org.example.security.Hasher.hashString;

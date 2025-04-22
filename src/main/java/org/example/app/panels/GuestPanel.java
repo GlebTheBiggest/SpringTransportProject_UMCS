@@ -1,7 +1,7 @@
 package org.example.app.panels;
 
 import org.example.controllers.auth.Authentication;
-import org.example.impls.services.InputService;
+import org.example.impls.services.input.InputService;
 import org.example.models.User;
 
 public class GuestPanel {

@@ -5,7 +5,8 @@ import org.example.interfaces.services.UserRepoService;
 import org.example.interfaces.services.VehicleRepoService;
 import org.example.models.Rental;
 
-import static org.example.impls.services.InputService.*;
+import static org.example.impls.services.GlobalSavingService.ifSave;
+import static org.example.impls.services.input.InputService.*;
 import static org.example.security.IdGenerator.generateId;
 
 public class AdminRentalPanel {
@@ -39,6 +40,7 @@ public class AdminRentalPanel {
                     return true;
                 }
                 case 'q' -> {
+                    ifSave();
                     System.out.println("Logging out...");
                     return false;
                 }
@@ -120,11 +122,11 @@ public class AdminRentalPanel {
     }
 
     private boolean validateVehicleId(String vehicleId) {
-        return vehicleService.getVehicleRepo().getVehicleById(vehicleId) != null;
+        return vehicleService.getVehicleRepo().getById(vehicleId) == null;
     }
 
     private boolean validateUserId(String userId) {
-        return userService.getUserRepo().getUserById(userId) != null;
+        return userService.getUserRepo().getById(userId) == null;
     }
 
     private boolean validateDate(String date) {

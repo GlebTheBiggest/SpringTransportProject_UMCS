@@ -2,8 +2,10 @@ package org.example.models;
 
 
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Data
+@NoArgsConstructor
 public class Rental {
     private String id;
     private String vehicleId;
@@ -17,10 +19,6 @@ public class Rental {
         this.userId = userId;
         this.rentDate = rentDate;
         this.expirationDate = expirationDate;
-    }
-
-    public String toCsv() {
-        return id + "," + vehicleId + "," + userId + "," + rentDate + "," + expirationDate;
     }
 
     public Rental cloneRental() {

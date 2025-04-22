@@ -9,10 +9,10 @@ public interface RentalRepo {
     List<Rental> getAll();
     Rental getById(String id);
     boolean add(Rental rental);
-    boolean saveCsv();
+    void saveCsv();
     void readCsv();
     List<Rental> getByUserId(String userId);
-    boolean saveJson();
+    void saveJson();
     void readJson();
     Optional<Rental> findByVehicleIdAndReturnDateIsNull(String id);
 }

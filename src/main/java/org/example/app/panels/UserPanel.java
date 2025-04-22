@@ -1,7 +1,7 @@
 package org.example.app.panels;
 
 import org.example.impls.services.GlobalSavingService;
-import org.example.impls.services.InputService;
+import org.example.impls.services.input.InputService;
 import org.example.interfaces.services.RentalRepoService;
 import org.example.interfaces.services.VehicleRepoService;
 import org.example.models.Rental;

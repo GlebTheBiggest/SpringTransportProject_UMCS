@@ -1,4 +1,4 @@
-package org.example.impls.services;
+package org.example.impls.services.repoServices;
 
 import org.example.interfaces.repositories.RentalRepo;
 import org.example.interfaces.repositories.VehicleRepo;

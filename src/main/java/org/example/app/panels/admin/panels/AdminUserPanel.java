@@ -8,7 +8,8 @@ import org.example.models.User;
 
 import java.util.List;
 
-import static org.example.impls.services.InputService.*;
+import static org.example.impls.services.GlobalSavingService.ifSave;
+import static org.example.impls.services.input.InputService.*;
 
 public class AdminUserPanel {
     private User USER;
@@ -47,6 +48,7 @@ public class AdminUserPanel {
                     return true;
                 }
                 case 'q' -> {
+                    ifSave();
                     System.out.println("Logging out...");
                     return false;
                 }
@@ -69,7 +71,7 @@ public class AdminUserPanel {
             return;
         }
         try {
-            User user = userService.getUserRepo().getUserById(userId);
+            User user = userService.getUserRepo().getById(userId);
             if (user == null) {
                 System.out.println("User with ID " + userId + " does not exist!");
             } else {
@@ -92,7 +94,7 @@ public class AdminUserPanel {
 
     private boolean removeUser() {
         String userId = getUserInput("Enter the ID of the user you want to remove: ");
-        if (userId == null || userId.isBlank()) {
+        if (userId.isBlank()) {
             System.out.println("Invalid or empty user ID!");
             return true;
         }
@@ -133,7 +135,7 @@ public class AdminUserPanel {
 
     private User fetchUser(String userId) {
         try {
-            User user = userService.getUserRepo().getUserById(userId);
+            User user = userService.getUserRepo().getById(userId);
             if (user == null) {
                 System.out.println("User with ID " + userId + " does not exist!");
                 return null;

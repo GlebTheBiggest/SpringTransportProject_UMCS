@@ -1,10 +1,9 @@
-package org.example.impls.services;
+package org.example.impls.services.input;
 
 import java.util.Scanner;
 
 public class InputService {
     private static final Scanner scanner = new Scanner(System.in);
-    private static char operator;
 
     public static char getOperatorInput(String message, char[] validOptions) {
         while (true) {

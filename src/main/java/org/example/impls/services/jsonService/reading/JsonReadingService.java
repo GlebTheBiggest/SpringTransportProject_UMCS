@@ -1,23 +1,23 @@
-package org.example.impls.services;
+package org.example.impls.services.jsonService.reading;
 
 import org.example.interfaces.services.RentalRepoService;
 import org.example.interfaces.services.UserRepoService;
 import org.example.interfaces.services.VehicleRepoService;
 
-public class JsonSavingService {
+public class JsonReadingService {
     private final UserRepoService userService;
     private final VehicleRepoService vehicleService;
     private final RentalRepoService rentalService;
 
-    public JsonSavingService(UserRepoService userService, VehicleRepoService vehicleService, RentalRepoService rentalService) {
+    public JsonReadingService(UserRepoService userService, VehicleRepoService vehicleService, RentalRepoService rentalService) {
         this.userService = userService;
         this.vehicleService = vehicleService;
         this.rentalService = rentalService;
     }
 
-    public void saveJson() {
-        userService.getUserRepo().saveJson();
-        vehicleService.getVehicleRepo().saveJson();
-        rentalService.getRentalRepo().saveJson();
+    public void read() {
+        userService.getUserRepo().readJson();
+        vehicleService.getVehicleRepo().readJson();
+        rentalService.getRentalRepo().readJson();
     }
 }

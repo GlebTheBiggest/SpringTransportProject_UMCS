@@ -33,9 +33,9 @@ public class VehicleRepoImpl implements VehicleRepo {
     }
 
     @Override
-    public Vehicle getVehicleById(String id) {
+    public Vehicle getById(String id) {
         return this.vehicles.stream()
-                .filter(v -> v.getId().equals(id))
+                .filter(vehicle -> vehicle.getId().equals(id))
                 .findFirst()
                 .orElse(null);
     }
@@ -52,12 +52,12 @@ public class VehicleRepoImpl implements VehicleRepo {
     }
 
     @Override
-    public boolean delete(String id) {
+    public boolean remove(String id) {
         return this.vehicles.removeIf(v -> v.getId().equals(id));
     }
 
     @Override
-    public boolean saveCsv() {
+    public void saveCsv() {
         List<String> lines = new ArrayList<>();
         Path file = Paths.get(CSV_FILE_NAME);
 
@@ -80,9 +80,7 @@ public class VehicleRepoImpl implements VehicleRepo {
             Files.write(file, lines, StandardCharsets.UTF_8, StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING);
         } catch (IOException e) {
             System.err.println("Error saving file: " + e.getMessage());
-            return false;
         }
-        return true;
     }
 
     @Override
@@ -151,17 +149,14 @@ public class VehicleRepoImpl implements VehicleRepo {
     }
 
     @Override
-    public boolean saveJson() {
+    public void saveJson() {
         Path file = Paths.get(JSON_FILE_NAME);
         ObjectMapper objectMapper = new ObjectMapper();
-
         try {
-            objectMapper.writeValue(file.toFile(), this.vehicles);
+            objectMapper.writerWithDefaultPrettyPrinter().writeValue(file.toFile(), this.vehicles);
         } catch (IOException e) {
             System.err.println("Error saving JSON file: " + e.getMessage());
-            return false;
         }
-        return true;
     }
 
     @Override
@@ -170,13 +165,15 @@ public class VehicleRepoImpl implements VehicleRepo {
         ObjectMapper objectMapper = new ObjectMapper();
 
         try {
-            List<Vehicle> loadedVehicles = objectMapper.readValue(path.toFile(), new TypeReference<List<Vehicle>>() {});
+            List<Vehicle> loadedVehicles = objectMapper.readValue(
+                    path.toFile(),
+                    new TypeReference<>() {
+                    }
+            );
             this.vehicles.clear();
             this.vehicles.addAll(loadedVehicles);
         } catch (IOException e) {
             System.err.println("Error reading JSON file: " + e.getMessage());
-        } catch (Exception e) {
-            System.err.println("Unexpected error: " + e.getMessage());
         }
     }
 }

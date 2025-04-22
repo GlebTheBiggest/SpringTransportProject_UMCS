@@ -7,7 +7,8 @@ import org.example.models.Vehicle;
 import java.util.HashMap;
 import java.util.Map;
 
-import static org.example.impls.services.InputService.*;
+import static org.example.impls.services.GlobalSavingService.ifSave;
+import static org.example.impls.services.input.InputService.*;
 import static org.example.security.IdGenerator.generateId;
 
 public class AdminVehiclePanel {
@@ -39,6 +40,7 @@ public class AdminVehiclePanel {
                     return true;
                 }
                 case 'q' -> {
+                    ifSave();
                     System.out.println("Logging out...");
                     return false;
                 }
@@ -56,12 +58,12 @@ public class AdminVehiclePanel {
 
     private void getVehicleById() {
         String vehicleId = getUserInput("Enter the ID of the vehicle you want to view: ");
-        if (vehicleId == null || vehicleId.isBlank()) {
+        if (vehicleId.isBlank()) {
             System.out.println("Invalid or empty vehicle ID!");
             return;
         }
         try {
-            Vehicle vehicle = vehicleService.getVehicleRepo().getVehicleById(vehicleId);
+            Vehicle vehicle = vehicleService.getVehicleRepo().getById(vehicleId);
             if (vehicle == null) {
                 System.out.println("Vehicle with ID " + vehicleId + " does not exist!");
             } else {
@@ -122,12 +124,12 @@ public class AdminVehiclePanel {
 
     private void removeVehicle() {
         String vehicleId = getUserInput("Enter the ID of the vehicle you want to remove: ");
-        if (vehicleId == null || vehicleId.isBlank()) {
+        if (vehicleId.isBlank()) {
             System.out.println("Invalid or empty vehicle ID!");
             return;
         }
         try {
-            Vehicle vehicle = vehicleService.getVehicleRepo().getVehicleById(vehicleId);
+            Vehicle vehicle = vehicleService.getVehicleRepo().getById(vehicleId);
             if (vehicle == null) {
                 System.out.println("Vehicle with ID " + vehicleId + " does not exist!");
                 return;
@@ -140,7 +142,7 @@ public class AdminVehiclePanel {
                 return;
             }
 
-            vehicleService.getVehicleRepo().delete(vehicleId);
+            vehicleService.getVehicleRepo().remove(vehicleId);
             vehicleService.getVehicleRepo().saveCsv();
             System.out.println("Vehicle removed successfully!");
         } catch (Exception e) {
@@ -151,7 +153,7 @@ public class AdminVehiclePanel {
     private String getValidatedInput(String prompt) {
         while (true) {
             String input = getUserInput(prompt);
-            if (input != null && !input.isBlank()) {
+            if (!input.isBlank()) {
                 return input;
             }
             System.out.println("Invalid or empty input. Please try again.");
@@ -184,7 +186,7 @@ public class AdminVehiclePanel {
                 return price;
             }
         } catch (NumberFormatException e) {
-            // Ignore for now
+            //
         }
         throw new IllegalArgumentException("Invalid price. Please provide a positive number.");
     }

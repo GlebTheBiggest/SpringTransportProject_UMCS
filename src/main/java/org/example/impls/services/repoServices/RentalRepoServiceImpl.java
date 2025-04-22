@@ -1,4 +1,4 @@
-package org.example.impls.services;
+package org.example.impls.services.repoServices;
 
 import org.example.interfaces.repositories.RentalRepo;
 import org.example.interfaces.services.RentalRepoService;
@@ -7,7 +7,7 @@ import org.example.models.Rental;
 import static org.example.security.IdGenerator.generateId;
 
 public class RentalRepoServiceImpl implements RentalRepoService {
-    private RentalRepo rentalRepo;
+    private final RentalRepo rentalRepo;
 
     public RentalRepoServiceImpl(RentalRepo rentalRepo) {
         if (rentalRepo == null) {

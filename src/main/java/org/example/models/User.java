@@ -1,8 +1,10 @@
 package org.example.models;
 
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Data
+@NoArgsConstructor
 public class User {
     private String id;
     private String login;
@@ -14,10 +16,6 @@ public class User {
         this.login = login;
         this.password = password;
         this.role = role;
-    }
-
-    public String toCsv() {
-        return id + "," + login + "," + password + "," + role;
     }
 
     public User cloneUser() {

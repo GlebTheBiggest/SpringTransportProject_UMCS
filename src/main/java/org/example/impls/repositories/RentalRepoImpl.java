@@ -37,11 +37,7 @@ public class RentalRepoImpl implements RentalRepo {
 
     @Override
     public boolean remove(String id) {
-        boolean removed = this.rentals.removeIf(rental -> String.valueOf(rental.getId()).equals(id));
-        if (removed) {
-            return saveCsv();
-        }
-        return false;
+        return this.rentals.removeIf(rental -> String.valueOf(rental.getId()).equals(id));
     }
 
     @Override
@@ -81,7 +77,7 @@ public class RentalRepoImpl implements RentalRepo {
     }
 
     @Override
-    public boolean saveCsv() {
+    public void saveCsv() {
         List<String> lines = new ArrayList<>();
         Path file = Paths.get(CSV_FILE_NAME);
 
@@ -101,9 +97,7 @@ public class RentalRepoImpl implements RentalRepo {
             Files.write(file, lines, StandardCharsets.UTF_8, StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING);
         } catch (IOException e) {
             System.err.println("Error saving file: " + e.getMessage());
-            return false;
         }
-        return true;
     }
 
     @Override
@@ -155,24 +149,26 @@ public class RentalRepoImpl implements RentalRepo {
     }
 
     @Override
-    public boolean saveJson() {
+    public void saveJson() {
         Path file = Paths.get(JSON_FILE_NAME);
         ObjectMapper objectMapper = new ObjectMapper();
         try {
-            objectMapper.writeValue(file.toFile(), this.rentals);
+            objectMapper.writerWithDefaultPrettyPrinter().writeValue(file.toFile(), this.rentals);
         } catch (IOException e) {
             System.err.println("Error saving JSON file: " + e.getMessage());
-            return false;
         }
-        return true;
     }
 
     @Override
     public void readJson() {
-        Path file = Paths.get(JSON_FILE_NAME);
+        Path path = Paths.get(JSON_FILE_NAME);
         ObjectMapper objectMapper = new ObjectMapper();
         try {
-            List<Rental> loadedRentals = objectMapper.readValue(file.toFile(), new TypeReference<List<Rental>>() {});
+            List<Rental> loadedRentals = objectMapper.readValue(
+                    path.toFile(),
+                    new TypeReference<>() {
+                    }
+            );
             this.rentals.clear();
             this.rentals.addAll(loadedRentals);
         } catch (IOException e) {
