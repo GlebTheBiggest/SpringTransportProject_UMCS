@@ -2,13 +2,18 @@ package org.example.models;
 
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.example.impls.services.AttributesConverter;
 
+import javax.persistence.*;
 import java.util.HashMap;
 import java.util.Map;
 
+@Entity
+@Table(name = "vehicles")
 @Data
 @NoArgsConstructor
 public class Vehicle {
+    @Id
     private String id;
     private String category;
     private String brand;
@@ -16,6 +21,8 @@ public class Vehicle {
     private int year;
     private String plate;
     private double price;
+    @Column(columnDefinition = "TEXT")
+    @Convert(converter = AttributesConverter.class)
     private Map<String, Object> attributes = Map.of();
 
 
@@ -28,18 +35,5 @@ public class Vehicle {
         this.plate = plate;
         this.price = price;
         this.attributes = attributes;
-    }
-
-    public Vehicle cloneVehicle() {
-        return new Vehicle(
-                id,
-                category,
-                brand,
-                model,
-                year,
-                plate,
-                price,
-                new HashMap<>(attributes)
-        );
     }
 }

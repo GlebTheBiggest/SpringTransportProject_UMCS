@@ -186,7 +186,7 @@ public class AdminVehiclePanel {
                 return price;
             }
         } catch (NumberFormatException e) {
-            //
+            System.out.println("Invalid price. Please provide a valid price.");
         }
         throw new IllegalArgumentException("Invalid price. Please provide a positive number.");
     }

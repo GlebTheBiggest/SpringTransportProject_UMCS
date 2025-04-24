@@ -2,6 +2,7 @@ package org.example.impls.repositories;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.example.app.dao.UserDao;
 import org.example.interfaces.repositories.UserRepo;
 import org.example.models.User;
 import java.io.IOException;
@@ -9,58 +10,83 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.*;
 import java.util.*;
 
+import static org.example.app.utils.HibernateUtil.getSessionFactory;
+
 public class UserRepoImpl implements UserRepo {
-    private final List<User> users;
+    //private final List<User> users;
     private static final String CSV_FILE_NAME = "users.csv";
     private static final String JSON_FILE_NAME = "users.json";
+    private final UserDao userDao;
 
     public UserRepoImpl() {
-        this.users = new ArrayList<>();
-        Path path = Paths.get(JSON_FILE_NAME);
+        //this.users = new ArrayList<>();
+        this.userDao = new UserDao(getSessionFactory());
+        /*Path path = Paths.get(JSON_FILE_NAME);
         if (Files.exists(path)) {
             readJson();
-        }
+        }*/
+        //users.addAll(userDao.findAll());
     }
 
     @Override
     public User getByLogin(String login) {
-        return this.users.stream()
+        /*return this.users.stream()
                 .filter(user -> Objects.equals(user.getLogin(), login))
                 .findFirst()
-                .orElse(null);
+                .orElse(null);*/
+        return userDao.findByLogin(login);
     }
 
     @Override
     public List<User> getAll() {
-        List<User> usersCopy = new ArrayList<>();
+        /*List<User> usersCopy = new ArrayList<>();
         for (User user : this.users) {
             usersCopy.add(user.cloneUser());
         }
-        return usersCopy;
+        return usersCopy;*/
+        return userDao.findAll();
     }
 
     @Override
     public User getById(String id) {
-        return this.users.stream()
+        /*return this.users.stream()
                 .filter(user -> user.getId().equals(id))
                 .findFirst()
-                .orElse(null);
+                .orElse(null);*/
+        return userDao.findById(id);
     }
 
     @Override
     public boolean add(User user) {
-        for (User u : this.users) {
+        /*for (User u : userDao.findAll()) {
             if (user.getId().equals(u.getId())) {
                 return false;
             }
         }
         this.users.add(user);
+        return true;*/
+
+        if (userDao.findById(user.getId()) != null) {
+            return false;
+        }
+        userDao.save(user);
         return true;
     }
 
     @Override
     public boolean remove(String id) {
-        return this.users.removeIf(user -> user.getId().equals(id));
+        //return this.users.removeIf(user -> user.getId().equals(id));
+        if (userDao.findById(id) == null) {
+            return false;
+        } else {
+            userDao.delete(userDao.findById(id));
+            return true;
+        }
+    }
+
+    @Override
+    public void removeAll() {
+        userDao.deleteAll();
     }
 
     @Override
@@ -68,7 +94,7 @@ public class UserRepoImpl implements UserRepo {
         List<String> lines = new ArrayList<>();
         Path file = Paths.get(CSV_FILE_NAME);
 
-        for (User user : this.users) {
+        for (User user : userDao.findAll()) {
             StringBuilder sb = new StringBuilder();
             sb.append("User(")
                     .append("id=").append(user.getId()).append("; ")
@@ -123,7 +149,8 @@ public class UserRepoImpl implements UserRepo {
                         }
                     }
 
-                    users.add(new User(id, name, password, role));
+                    //users.add(new User(id, name, password, role));
+                    userDao.save(new User(id, name, password, role));
                 } catch (Exception e) {
                     System.err.println("Error parsing user: " + line + ", reason: " + e.getMessage());
                 }
@@ -139,7 +166,7 @@ public class UserRepoImpl implements UserRepo {
         ObjectMapper objectMapper = new ObjectMapper();
 
         try {
-            objectMapper.writerWithDefaultPrettyPrinter().writeValue(file.toFile(), this.users);
+            objectMapper.writerWithDefaultPrettyPrinter().writeValue(file.toFile(), userDao.findAll());
         } catch (IOException e) {
             System.err.println("Error saving JSON file: " + e.getMessage());
         }
@@ -149,19 +176,22 @@ public class UserRepoImpl implements UserRepo {
     public void readJson() {
         Path path = Paths.get(JSON_FILE_NAME);
         ObjectMapper objectMapper = new ObjectMapper();
-
         try {
             List<User> loadedUsers = objectMapper.readValue(
                     path.toFile(),
                     new TypeReference<>() {
                     }
             );
-            this.users.clear();
-            this.users.addAll(loadedUsers);
+            // this.users.clear();
+            // this.users.addAll(loadedUsers);
+            for (User user : loadedUsers) {
+                userDao.save(user);
+            }
+
         } catch (IOException e) {
             System.err.println("Error reading JSON file: " + e.getMessage());
         } catch (Exception e) {
-            System.err.println("Unexpected error: " + e.getMessage());
+            System.err.println("Unforgiven error: " + e.getMessage());
         }
     }
 }

@@ -14,4 +14,5 @@ public interface UserRepo {
     User getByLogin(String login);
     void saveJson();
     void readJson();
+    void removeAll();
 }

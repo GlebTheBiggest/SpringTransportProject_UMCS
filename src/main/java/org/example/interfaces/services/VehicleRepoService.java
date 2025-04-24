@@ -7,7 +7,7 @@ import org.example.models.Vehicle;
 import java.util.List;
 
 public interface VehicleRepoService {
-    void printAllVehicles();
     VehicleRepo getVehicleRepo();
+    void printAllVehicles();
     List<Vehicle> getAllAvailableVehicles(RentalRepo rentalRepo);
 }

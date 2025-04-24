@@ -36,6 +36,7 @@ public class AdminRentalPanel {
                 case '2' -> getRentalById();
                 case '3' -> addRental();
                 case '4' -> removeRental();
+                case '5' -> removeAllRentals();
                 case 'b' -> {
                     return true;
                 }
@@ -118,6 +119,15 @@ public class AdminRentalPanel {
             System.out.println("Rental removed successfully!");
         } catch (Exception e) {
             System.out.println("An error occurred while removing the rental: " + e.getMessage());
+        }
+    }
+
+    public void removeAllRentals() {
+        if (rentalService.getRentalRepo().getAll().isEmpty()) {
+            System.out.println("There is no rental to remove!");
+        } else {
+            rentalService.getRentalRepo().removeAll();
+            System.out.println("Rentals have been removed successfully!");
         }
     }
 

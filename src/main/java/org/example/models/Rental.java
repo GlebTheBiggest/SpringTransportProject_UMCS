@@ -4,10 +4,19 @@ package org.example.models;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.Id;
+import javax.persistence.Table;
+
+@Entity
+@Table(name = "rentals")
 @Data
 @NoArgsConstructor
 public class Rental {
+    @Id
     private String id;
+    @Column(unique = true, nullable = false)
     private String vehicleId;
     private String userId;
     private String rentDate;
@@ -19,9 +28,5 @@ public class Rental {
         this.userId = userId;
         this.rentDate = rentDate;
         this.expirationDate = expirationDate;
-    }
-
-    public Rental cloneRental() {
-        return new Rental(id, vehicleId, userId, rentDate, expirationDate);
     }
 }

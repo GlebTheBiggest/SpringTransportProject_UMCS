@@ -15,4 +15,5 @@ public interface RentalRepo {
     void saveJson();
     void readJson();
     Optional<Rental> findByVehicleIdAndReturnDateIsNull(String id);
+    void removeAll();
 }

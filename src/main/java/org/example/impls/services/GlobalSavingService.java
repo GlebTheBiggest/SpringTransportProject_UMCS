@@ -47,15 +47,10 @@ public class GlobalSavingService {
     public static void ifSave() {
         char operator;
         if (confirmAction("Do you want to save changes (yes/no)?: ")) {
-            operator = getOperatorInput("1 - Save in .csv \n" +
-                                        "2 - Save in .json", new char[]{'1', '2'});
-            if (operator == '1') {
-                new CsvSavingService(userService, vehicleService, rentalService).saveCsv();
-                System.out.println("Data has been saved in .csv successfully!");
-            } else {
-                new JsonSavingService(userService, vehicleService, rentalService).saveJson();
-                System.out.println("Data has been saved in .json successfully!");
-            }
+            new CsvSavingService(userService, vehicleService, rentalService).saveCsv();
+            System.out.println("Data has been saved in .csv successfully!");
+            new JsonSavingService(userService, vehicleService, rentalService).saveJson();
+            System.out.println("Data has been saved in .json successfully!");
         }
     }
 }

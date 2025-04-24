@@ -1,5 +1,6 @@
 package org.example.impls.services.repoServices;
 
+import lombok.Data;
 import org.example.interfaces.repositories.RentalRepo;
 import org.example.interfaces.repositories.VehicleRepo;
 import org.example.interfaces.services.VehicleRepoService;
@@ -9,13 +10,11 @@ import org.example.models.Vehicle;
 import java.util.ArrayList;
 import java.util.List;
 
+@Data
 public class VehicleRepoServiceImpl implements VehicleRepoService {
     private final VehicleRepo vehicleRepo;
 
     public VehicleRepoServiceImpl(VehicleRepo vehicleRepo) {
-        if (vehicleRepo == null) {
-            throw new IllegalArgumentException("VehicleRepo cannot be null");
-        }
         this.vehicleRepo = vehicleRepo;
     }
 
@@ -26,11 +25,6 @@ public class VehicleRepoServiceImpl implements VehicleRepoService {
         } else {
             vehicleRepo.getAll().forEach(System.out::println);
         }
-    }
-
-    @Override
-    public VehicleRepo getVehicleRepo() {
-        return this.vehicleRepo;
     }
 
     @Override

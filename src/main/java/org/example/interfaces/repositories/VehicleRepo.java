@@ -12,4 +12,5 @@ public interface VehicleRepo {
     void readCsv();
     void saveJson();
     void readJson();
+    void removeAll();
 }

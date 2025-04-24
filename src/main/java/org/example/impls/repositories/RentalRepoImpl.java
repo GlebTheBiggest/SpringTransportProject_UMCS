@@ -2,77 +2,70 @@ package org.example.impls.repositories;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.example.app.dao.RentalDao;
 import org.example.interfaces.repositories.RentalRepo;
 import org.example.models.Rental;
 
 import java.io.IOException;
-import java.nio.charset.StandardCharsets;
 import java.nio.file.*;
 import java.util.*;
 
+import static org.example.app.utils.HibernateUtil.getSessionFactory;
+
 public class RentalRepoImpl implements RentalRepo {
-    private final List<Rental> rentals;
     private static final String CSV_FILE_NAME = "rentals.csv";
     private static final String JSON_FILE_NAME = "rentals.json";
-
+    private final RentalDao rentalDao;
 
     public RentalRepoImpl() {
-        this.rentals = new ArrayList<>();
-        Path path = Paths.get(JSON_FILE_NAME);
-        if (Files.exists(path)) {
-            readJson();
-        }
+        this.rentalDao = new RentalDao(getSessionFactory());
     }
 
     @Override
     public boolean add(Rental rental) {
-        for (Rental r : this.rentals) {
-            if (rental.getId().equals(r.getId())) {
-                return false;
-            }
+        if (rentalDao.findById(rental.getId()) != null) {
+            return false;
         }
-        this.rentals.add(rental);
+        rentalDao.save(rental);
         return true;
     }
 
     @Override
     public boolean remove(String id) {
-        return this.rentals.removeIf(rental -> String.valueOf(rental.getId()).equals(id));
+        Rental rental = rentalDao.findById(id);
+        if (rental == null) {
+            return false;
+        }
+        rentalDao.delete(rental);
+        return true;
+    }
+
+    @Override
+    public void removeAll() {
+        rentalDao.deleteAllRentals();
     }
 
     @Override
     public Rental getById(String id) {
-        return this.rentals.stream()
-                .filter(rental -> String.valueOf(rental.getId()).equals(id))
-                .findFirst()
-                .orElse(null);
+        return rentalDao.findById(id);
     }
 
     @Override
     public List<Rental> getAll() {
-        List<Rental> rentalsCopy = new ArrayList<>();
-        for (Rental rental : this.rentals) {
-            rentalsCopy.add(rental.cloneRental());
-        }
-        return rentalsCopy;
+        return rentalDao.findAll();
     }
 
     @Override
     public List<Rental> getByUserId(String userId) {
-        List<Rental> userRentals = new ArrayList<>();
-        for (Rental rental : this.rentals) {
-            if (String.valueOf(rental.getUserId()).equals(userId)) {
-                userRentals.add(rental.cloneRental());
-            }
-        }
-        return userRentals;
+        return rentalDao.findAll().stream()
+                .filter(rental -> rental.getUserId().equals(userId))
+                .toList();
     }
 
     @Override
     public Optional<Rental> findByVehicleIdAndReturnDateIsNull(String vehicleId) {
-        return rentals.stream()
-                .filter(r -> r.getVehicleId().equals(vehicleId))
-                .filter(r -> r.getExpirationDate() == null)
+        return rentalDao.findAll().stream()
+                .filter(rental -> rental.getVehicleId().equals(vehicleId) && rental.getExpirationDate() == null)
                 .findFirst();
     }
 
@@ -81,7 +74,7 @@ public class RentalRepoImpl implements RentalRepo {
         List<String> lines = new ArrayList<>();
         Path file = Paths.get(CSV_FILE_NAME);
 
-        for (Rental rental : this.rentals) {
+        for (Rental rental : rentalDao.findAll()) {
             StringBuilder sb = new StringBuilder();
             sb.append("Rental(")
                     .append("id=").append(rental.getId()).append("; ")
@@ -94,7 +87,7 @@ public class RentalRepoImpl implements RentalRepo {
         }
 
         try {
-            Files.write(file, lines, StandardCharsets.UTF_8, StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING);
+            Files.write(file, lines, StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING);
         } catch (IOException e) {
             System.err.println("Error saving file: " + e.getMessage());
         }
@@ -104,44 +97,31 @@ public class RentalRepoImpl implements RentalRepo {
     public void readCsv() {
         Path path = Paths.get(CSV_FILE_NAME);
 
-        try (Scanner input = new Scanner(path, StandardCharsets.UTF_8)) {
+        try (Scanner input = new Scanner(path)) {
             while (input.hasNextLine()) {
                 String line = input.nextLine().trim();
-                if (line.isEmpty()) continue;
-
-                try {
-                    if (!line.startsWith("Rental(") || !line.endsWith(")")) {
-                        System.err.println("Invalid format: " + line);
-                        continue;
-                    }
-
-                    line = line.substring(7, line.length() - 1); // Видаляємо "Rental(" та ")"
-                    String[] parts = line.split("; ");
-                    String id = null, userId = null, vehicleId = null, rentalDate = null, expirationDate = null;
-
-                    for (String part : parts) {
-                        String[] keyValue = part.split("=", 2);
-                        if (keyValue.length != 2) {
-                            System.err.println("Invalid key-value format: " + part);
-                            continue;
-                        }
-
-                        String key = keyValue[0].trim();
-                        String value = keyValue[1].trim();
-
-                        switch (key) {
-                            case "id" -> id = value;
-                            case "userId" -> userId = value;
-                            case "vehicleId" -> vehicleId = value;
-                            case "rentalDate" -> rentalDate = value;
-                            case "expirationDate" -> expirationDate = value;
-                        }
-                    }
-
-                    rentals.add(new Rental(id, userId, vehicleId, rentalDate, expirationDate));
-                } catch (Exception e) {
-                    System.err.println("Error parsing rental: " + line + ", reason: " + e.getMessage());
+                if (line.isEmpty() || !line.startsWith("Rental(") || !line.endsWith(")")) {
+                    continue;
                 }
+
+                line = line.substring(7, line.length() - 1); // Remove "Rental(" and ")"
+                String[] parts = line.split("; ");
+                String id = null, userId = null, vehicleId = null, rentalDate = null, expirationDate = null;
+
+                for (String part : parts) {
+                    String[] keyValue = part.split("=", 2);
+                    if (keyValue.length == 2) {
+                        switch (keyValue[0].trim()) {
+                            case "id" -> id = keyValue[1].trim();
+                            case "userId" -> userId = keyValue[1].trim();
+                            case "vehicleId" -> vehicleId = keyValue[1].trim();
+                            case "rentalDate" -> rentalDate = keyValue[1].trim();
+                            case "expirationDate" -> expirationDate = keyValue[1].trim();
+                        }
+                    }
+                }
+
+                rentalDao.save(new Rental(id, userId, vehicleId, rentalDate, expirationDate));
             }
         } catch (IOException e) {
             System.err.println("Error reading file: " + e.getMessage());
@@ -152,8 +132,9 @@ public class RentalRepoImpl implements RentalRepo {
     public void saveJson() {
         Path file = Paths.get(JSON_FILE_NAME);
         ObjectMapper objectMapper = new ObjectMapper();
+
         try {
-            objectMapper.writerWithDefaultPrettyPrinter().writeValue(file.toFile(), this.rentals);
+            objectMapper.writerWithDefaultPrettyPrinter().writeValue(file.toFile(), rentalDao.findAll());
         } catch (IOException e) {
             System.err.println("Error saving JSON file: " + e.getMessage());
         }
@@ -163,18 +144,17 @@ public class RentalRepoImpl implements RentalRepo {
     public void readJson() {
         Path path = Paths.get(JSON_FILE_NAME);
         ObjectMapper objectMapper = new ObjectMapper();
+
         try {
             List<Rental> loadedRentals = objectMapper.readValue(
                     path.toFile(),
-                    new TypeReference<>() {
-                    }
+                    new TypeReference<>() {}
             );
-            this.rentals.clear();
-            this.rentals.addAll(loadedRentals);
+            for (Rental rental : loadedRentals) {
+                rentalDao.save(rental);
+            }
         } catch (IOException e) {
             System.err.println("Error reading JSON file: " + e.getMessage());
-        } catch (Exception e) {
-            System.err.println("Unexpected error: " + e.getMessage());
         }
     }
 }

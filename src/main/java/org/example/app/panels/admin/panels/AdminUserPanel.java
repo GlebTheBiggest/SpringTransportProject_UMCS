@@ -36,7 +36,7 @@ public class AdminUserPanel {
                     q - Log out""");
             char operator = getOperatorInput("Enter your choice: ", new char[]{'1', '2', '3', '4', 'b', 'q'});
             switch (operator) {
-                case '1' -> fetchAllUsers();
+                case '1' -> getAll();
                 case '2' -> getUserById();
                 case '3' -> addUser();
                 case '4' -> {
@@ -44,6 +44,7 @@ public class AdminUserPanel {
                         return false;
                     }
                 }
+                case '5' -> removeAllUsers();
                 case 'b' -> {
                     return true;
                 }
@@ -56,7 +57,7 @@ public class AdminUserPanel {
         }
     }
 
-    private void fetchAllUsers() {
+    private void getAll() {
         try {
             userService.printAllUsers();
         } catch (Exception e) {
@@ -131,6 +132,15 @@ public class AdminUserPanel {
             System.out.println("An error occurred while removing the user: " + e.getMessage());
         }
         return true;
+    }
+
+    public void removeAllUsers() {
+        if (rentalService.getRentalRepo().getAll().isEmpty()) {
+            System.out.println("There is no rental to remove!");
+        } else {
+            rentalService.getRentalRepo().removeAll();
+            System.out.println("Rentals have been removed successfully!");
+        }
     }
 
     private User fetchUser(String userId) {

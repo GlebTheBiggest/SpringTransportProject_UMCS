@@ -38,14 +38,12 @@ public class AdminPanel {
                     3 - Rental Management
                     4 - Save in .csv
                     5 - Save in .json
-                    6 - Save in database/////
-                    7 - Read from .csv
-                    8 - Read from .json
-                    9 - Read from database/////
+                    6 - Read from .csv
+                    7 - Read from .json
                     s - Save global
                     u - Your Account
                     q - Log out""");
-            char operator = getOperatorInput("Enter your choice: ", new char[]{'1', '2', '3', '4', '5', '6', '7', '8', '9', 's', 'u', 'q'});
+            char operator = getOperatorInput("Enter your choice: ", new char[]{'1', '2', '3', '4', '5', '6', '7', 's', 'u', 'q'});
             switch (operator) {
                 case '1' -> {
                     if (!new AdminUserPanel(USER, userService, rentalService, auth).start()) {
@@ -71,18 +69,12 @@ public class AdminPanel {
                     System.out.println("Data has been saved in .json successfully!");
                 }
                 case '6' -> {
-                    //
-                }
-                case '7' -> {
                     new CsvReadingService(userService, vehicleService, rentalService).read();
                     System.out.println("Data has been read from .csv successfully!");
                 }
-                case '8' -> {
+                case '7' -> {
                     new JsonReadingService(userService, vehicleService, rentalService).read();
                     System.out.println("Data has been read from .json successfully!");
-                }
-                case '9' -> {
-                    //
                 }
                 case 's' -> {
                     new GlobalSavingService(userService, vehicleService, rentalService).save();
@@ -99,6 +91,4 @@ public class AdminPanel {
             }
         }
     }
-
-
 }
