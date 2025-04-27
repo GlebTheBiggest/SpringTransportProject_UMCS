@@ -2,6 +2,7 @@ package org.example.app.panels.admin.panels;
 
 import org.example.interfaces.services.RentalRepoService;
 import org.example.interfaces.services.VehicleRepoService;
+import org.example.models.Rental;
 import org.example.models.Vehicle;
 
 import java.util.HashMap;
@@ -28,14 +29,16 @@ public class AdminVehiclePanel {
                     2 - Get vehicle by ID
                     3 - Add vehicle
                     4 - Remove vehicle
+                    5 - Remove all vehicles
                     b - Step back
                     q - Log out""");
-            char operator = getOperatorInput("Enter your choice: ", new char[]{'1', '2', '3', '4', 'b', 'q'});
+            char operator = getOperatorInput("Enter your choice: ", new char[]{'1', '2', '3', '4', '5', 'b', 'q'});
             switch (operator) {
                 case '1' -> fetchAllVehicles();
                 case '2' -> getVehicleById();
                 case '3' -> addVehicle();
                 case '4' -> removeVehicle();
+                case '5' -> removeAllVehicles();
                 case 'b' -> {
                     return true;
                 }
@@ -45,6 +48,23 @@ public class AdminVehiclePanel {
                     return false;
                 }
             }
+        }
+    }
+
+    private void removeAllVehicles() {
+        if (vehicleService.getVehicleRepo().getAll().isEmpty()) {
+            System.out.println("There is no vehicles to remove!");
+            return;
+        }
+        if (!rentalService.getRentalRepo().getAll().isEmpty()) {
+            System.out.println("That vehicles are rented now:");
+            for (Rental rental : rentalService.getRentalRepo().getAll()) {
+                System.out.println(rental.getVehicleId());
+            }
+        }
+        if (!confirmAction("Are you sure (yes/no)? ")) {
+            vehicleService.getVehicleRepo().removeAll();
+            System.out.println("Vehicles have been removed successfully!");
         }
     }
 

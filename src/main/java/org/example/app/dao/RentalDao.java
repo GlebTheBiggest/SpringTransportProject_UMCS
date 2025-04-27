@@ -49,7 +49,7 @@ public class RentalDao {
         }
     }
 
-    public void deleteAllRentals() {
+    public void deleteAll() {
         try (Session session = sessionFactory.openSession()) {
             Transaction tx = session.beginTransaction();
             session.createQuery("delete from Rental").executeUpdate();

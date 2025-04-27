@@ -14,7 +14,7 @@ public class CsvSavingService {
         this.vehicleService = vehicleService;
         this.rentalService = rentalService;
     }
-    public void saveCsv() {
+    public void save() {
         userService.getUserRepo().saveCsv();
         vehicleService.getVehicleRepo().saveCsv();
         rentalService.getRentalRepo().saveCsv();

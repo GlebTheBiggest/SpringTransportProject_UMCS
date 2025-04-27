@@ -5,6 +5,9 @@ import org.example.interfaces.services.UserRepoService;
 import org.example.interfaces.services.VehicleRepoService;
 import org.example.models.Rental;
 
+import java.util.List;
+import java.util.Optional;
+
 import static org.example.impls.services.GlobalSavingService.ifSave;
 import static org.example.impls.services.input.InputService.*;
 import static org.example.security.IdGenerator.generateId;
@@ -28,15 +31,18 @@ public class AdminRentalPanel {
                     2 - Get rental by ID
                     3 - Add rental
                     4 - Remove rental
+                    5 - Remove all rentals
+                    6 - Get expired rentals
                     b - Step back
                     q - Log out""");
-            char operator = getOperatorInput("Enter your choice: ", new char[]{'1', '2', '3', '4', 'b', 'q'});
+            char operator = getOperatorInput("Enter your choice: ", new char[]{'1', '2', '3', '4', '5', '6', 'b', 'q'});
             switch (operator) {
                 case '1' -> rentalService.printAllRentals();
                 case '2' -> getRentalById();
                 case '3' -> addRental();
                 case '4' -> removeRental();
                 case '5' -> removeAllRentals();
+                case '6' -> findOverdueRentals();
                 case 'b' -> {
                     return true;
                 }
@@ -45,6 +51,21 @@ public class AdminRentalPanel {
                     System.out.println("Logging out...");
                     return false;
                 }
+            }
+        }
+    }
+
+    private void findOverdueRentals() {
+        Optional<List<Rental>> overdueRentals = rentalService.getRentalRepo().findOverdueRentals();
+        if (overdueRentals.isEmpty()) {
+            System.out.println("Expired rentals were not found");
+        } else {
+            System.out.println("Expired rentals: " + overdueRentals);
+            if (confirmAction("Remove that rentals (yes/no)?: ")) {
+                for (Rental rental : overdueRentals.get()) {
+                    rentalService.getRentalRepo().remove(rental.getId());
+                }
+                System.out.println("Removed " + overdueRentals.get().size() + " rentals");
             }
         }
     }

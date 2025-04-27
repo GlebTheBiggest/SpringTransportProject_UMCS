@@ -32,9 +32,10 @@ public class AdminUserPanel {
                     2 - Get user by ID
                     3 - Add user
                     4 - Remove user
+                    5 - Remove all users
                     b - Step back
                     q - Log out""");
-            char operator = getOperatorInput("Enter your choice: ", new char[]{'1', '2', '3', '4', 'b', 'q'});
+            char operator = getOperatorInput("Enter your choice: ", new char[]{'1', '2', '3', '4', '5', 'b', 'q'});
             switch (operator) {
                 case '1' -> getAll();
                 case '2' -> getUserById();
@@ -134,12 +135,20 @@ public class AdminUserPanel {
         return true;
     }
 
-    public void removeAllUsers() {
-        if (rentalService.getRentalRepo().getAll().isEmpty()) {
-            System.out.println("There is no rental to remove!");
-        } else {
-            rentalService.getRentalRepo().removeAll();
-            System.out.println("Rentals have been removed successfully!");
+    private void removeAllUsers() {
+        if (userService.getUserRepo().getAll().isEmpty()) {
+            System.out.println("There is no users to remove!");
+            return;
+        }
+        if (!rentalService.getRentalRepo().getAll().isEmpty()) {
+            System.out.println("That users are renting now:");
+            for (Rental rental : rentalService.getRentalRepo().getAll()) {
+                System.out.println(rental.getId());
+            }
+        }
+        if (!confirmAction("Are you sure (yes/no)? ")) {
+            userService.getUserRepo().removeAll();
+            System.out.println("Users have been removed successfully!");
         }
     }
 

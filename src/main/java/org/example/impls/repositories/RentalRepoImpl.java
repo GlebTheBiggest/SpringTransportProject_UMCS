@@ -8,6 +8,7 @@ import org.example.models.Rental;
 
 import java.io.IOException;
 import java.nio.file.*;
+import java.time.LocalDate;
 import java.util.*;
 
 import static org.example.app.utils.HibernateUtil.getSessionFactory;
@@ -42,7 +43,7 @@ public class RentalRepoImpl implements RentalRepo {
 
     @Override
     public void removeAll() {
-        rentalDao.deleteAllRentals();
+        rentalDao.deleteAll();
     }
 
     @Override
@@ -63,10 +64,18 @@ public class RentalRepoImpl implements RentalRepo {
     }
 
     @Override
-    public Optional<Rental> findByVehicleIdAndReturnDateIsNull(String vehicleId) {
-        return rentalDao.findAll().stream()
-                .filter(rental -> rental.getVehicleId().equals(vehicleId) && rental.getExpirationDate() == null)
-                .findFirst();
+    public Optional<List<Rental>> findOverdueRentals() {
+        LocalDate currentDate = LocalDate.now();
+        List<Rental> overdueRentals = rentalDao.findAll().stream()
+                .filter(rental -> {
+                    if (rental.getExpirationDate() != null) {
+                        LocalDate expirationDate = LocalDate.parse(rental.getExpirationDate());
+                        return expirationDate.isBefore(currentDate);
+                    }
+                    return false;
+                })
+                .toList();
+        return overdueRentals.isEmpty() ? Optional.empty() : Optional.of(overdueRentals);
     }
 
     @Override
@@ -100,11 +109,11 @@ public class RentalRepoImpl implements RentalRepo {
         try (Scanner input = new Scanner(path)) {
             while (input.hasNextLine()) {
                 String line = input.nextLine().trim();
-                if (line.isEmpty() || !line.startsWith("Rental(") || !line.endsWith(")")) {
+                if (!line.startsWith("Rental(") || !line.endsWith(")")) {
                     continue;
                 }
 
-                line = line.substring(7, line.length() - 1); // Remove "Rental(" and ")"
+                line = line.substring(7, line.length() - 1);
                 String[] parts = line.split("; ");
                 String id = null, userId = null, vehicleId = null, rentalDate = null, expirationDate = null;
 
@@ -121,7 +130,14 @@ public class RentalRepoImpl implements RentalRepo {
                     }
                 }
 
-                rentalDao.save(new Rental(id, userId, vehicleId, rentalDate, expirationDate));
+                Rental rental = new Rental(id, userId, vehicleId, rentalDate, expirationDate);
+                Rental existingRental = rentalDao.findById(id);
+
+                if (existingRental != null) {
+                    rentalDao.update(rental);
+                } else {
+                    rentalDao.save(rental);
+                }
             }
         } catch (IOException e) {
             System.err.println("Error reading file: " + e.getMessage());
@@ -150,8 +166,15 @@ public class RentalRepoImpl implements RentalRepo {
                     path.toFile(),
                     new TypeReference<>() {}
             );
+
             for (Rental rental : loadedRentals) {
-                rentalDao.save(rental);
+                Rental existingRental = rentalDao.findById(rental.getId());
+
+                if (existingRental != null) {
+                    rentalDao.update(rental);
+                } else {
+                    rentalDao.save(rental);
+                }
             }
         } catch (IOException e) {
             System.err.println("Error reading JSON file: " + e.getMessage());

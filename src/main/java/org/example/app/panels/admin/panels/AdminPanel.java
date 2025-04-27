@@ -1,7 +1,6 @@
 package org.example.app.panels.admin.panels;
 
 import org.example.controllers.auth.Authentication;
-import org.example.impls.services.*;
 import org.example.impls.services.csvService.reading.CsvReadingService;
 import org.example.impls.services.csvService.saving.CsvSavingService;
 import org.example.impls.services.jsonService.reading.JsonReadingService;
@@ -36,11 +35,8 @@ public class AdminPanel {
                     1 - User Management
                     2 - Vehicle Management
                     3 - Rental Management
-                    4 - Save in .csv
-                    5 - Save in .json
-                    6 - Read from .csv
-                    7 - Read from .json
-                    s - Save global
+                    4 - Make a backup
+                    5 - Read from backup
                     u - Your Account
                     q - Log out""");
             char operator = getOperatorInput("Enter your choice: ", new char[]{'1', '2', '3', '4', '5', '6', '7', 's', 'u', 'q'});
@@ -61,28 +57,30 @@ public class AdminPanel {
                     }
                 }
                 case '4' -> {
-                    new CsvSavingService(userService, vehicleService, rentalService).saveCsv();
-                    System.out.println("Data has been saved in .csv successfully!");
+                    operator = getOperatorInput("Do you want to make backup in .csv, .json or both (c/j/b)? ", new char[]{'c', 'j', 'b'});
+                    if (operator == 'c') {
+                        new CsvSavingService(userService, vehicleService, rentalService).save();
+                        System.out.println("Data has been saved in .csv successfully!");
+                    } else if (operator == 'j') {
+                        new JsonSavingService(userService, vehicleService, rentalService).save();
+                        System.out.println("Data has been saved in .json successfully!");
+                    } else {
+                        new CsvSavingService(userService, vehicleService, rentalService).save();
+                        new JsonSavingService(userService, vehicleService, rentalService).save();
+                        System.out.println("The backup has been made successfully!");
+                    }
                 }
                 case '5' -> {
-                    new JsonSavingService(userService, vehicleService, rentalService).saveJson();
-                    System.out.println("Data has been saved in .json successfully!");
+                    operator = getOperatorInput("Do you want to read from .csv or .json (c/j)? ", new char[]{'c', 'j'});
+                    if (operator == 'c') {
+                        new CsvReadingService(userService, vehicleService, rentalService).read();
+                        System.out.println("Data has been read from.csv successfully!");
+                    } else {
+                        new JsonReadingService(userService, vehicleService, rentalService).read();
+                        System.out.println("Data has been read from .json successfully!");
+                    }
                 }
-                case '6' -> {
-                    new CsvReadingService(userService, vehicleService, rentalService).read();
-                    System.out.println("Data has been read from .csv successfully!");
-                }
-                case '7' -> {
-                    new JsonReadingService(userService, vehicleService, rentalService).read();
-                    System.out.println("Data has been read from .json successfully!");
-                }
-                case 's' -> {
-                    new GlobalSavingService(userService, vehicleService, rentalService).save();
-                    System.out.println("Data has been saved successfully!");
-                }
-                case 'u' -> {
-                    System.out.println(USER.toString());
-                }
+                case 'u' -> System.out.println(USER.toString());
                 case 'q' -> {
                     ifSave();
                     System.out.println("Logging out...");

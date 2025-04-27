@@ -15,7 +15,7 @@ public class JsonSavingService {
         this.rentalService = rentalService;
     }
 
-    public void saveJson() {
+    public void save() {
         userService.getUserRepo().saveJson();
         vehicleService.getVehicleRepo().saveJson();
         rentalService.getRentalRepo().saveJson();

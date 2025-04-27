@@ -14,6 +14,6 @@ public interface RentalRepo {
     List<Rental> getByUserId(String userId);
     void saveJson();
     void readJson();
-    Optional<Rental> findByVehicleIdAndReturnDateIsNull(String id);
+    Optional<List<Rental>> findOverdueRentals();
     void removeAll();
 }

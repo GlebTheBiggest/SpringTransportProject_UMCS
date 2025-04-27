@@ -86,10 +86,11 @@ public class VehicleRepoImpl implements VehicleRepo {
     public void readCsv() {
         Path path = Paths.get(CSV_FILE_NAME);
 
-        try (Scanner input = new Scanner(path)) {
+        try (Scanner input = new Scanner(path, StandardCharsets.UTF_8)) {
             while (input.hasNextLine()) {
                 String line = input.nextLine().trim();
-                if (line.isEmpty() || !line.startsWith("Vehicle(") || !line.endsWith(")")) {
+                if (!line.startsWith("Vehicle(") || !line.endsWith(")")) {
+                    System.err.println("Invalid format: " + line);
                     continue;
                 }
 
@@ -126,7 +127,15 @@ public class VehicleRepoImpl implements VehicleRepo {
                         }
                     }
                 }
-                vehicleDao.save(new Vehicle(id, category, brand, model, year, plate, price, attributes));
+
+                Vehicle vehicle = new Vehicle(id, category, brand, model, year, plate, price, attributes);
+                Vehicle existingVehicle = vehicleDao.findById(id);
+
+                if (existingVehicle != null) {
+                    vehicleDao.update(vehicle);
+                } else {
+                    vehicleDao.save(vehicle);
+                }
             }
         } catch (IOException e) {
             System.err.println("Error reading file: " + e.getMessage());
@@ -155,8 +164,15 @@ public class VehicleRepoImpl implements VehicleRepo {
                     path.toFile(),
                     new TypeReference<>() {}
             );
+
             for (Vehicle vehicle : loadedVehicles) {
-                vehicleDao.save(vehicle);
+                Vehicle existingVehicle = vehicleDao.findById(vehicle.getId());
+
+                if (existingVehicle != null) {
+                    vehicleDao.update(vehicle);
+                } else {
+                    vehicleDao.save(vehicle);
+                }
             }
         } catch (IOException e) {
             System.err.println("Error reading JSON file: " + e.getMessage());

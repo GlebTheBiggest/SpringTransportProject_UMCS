@@ -8,7 +8,6 @@ import org.example.interfaces.services.UserRepoService;
 import org.example.interfaces.services.VehicleRepoService;
 
 import static org.example.impls.services.input.InputService.confirmAction;
-import static org.example.impls.services.input.InputService.getOperatorInput;
 
 @Data
 public class GlobalSavingService {
@@ -17,12 +16,6 @@ public class GlobalSavingService {
     private static RentalRepoService rentalService;
 
     public GlobalSavingService(VehicleRepoService vehicleService, RentalRepoService rentalService) {
-        GlobalSavingService.vehicleService = vehicleService;
-        GlobalSavingService.rentalService = rentalService;
-    }
-
-    public GlobalSavingService(UserRepoService userService, VehicleRepoService vehicleService, RentalRepoService rentalService) {
-        GlobalSavingService.userService = userService;
         GlobalSavingService.vehicleService = vehicleService;
         GlobalSavingService.rentalService = rentalService;
     }
@@ -45,11 +38,10 @@ public class GlobalSavingService {
     }
 
     public static void ifSave() {
-        char operator;
-        if (confirmAction("Do you want to save changes (yes/no)?: ")) {
-            new CsvSavingService(userService, vehicleService, rentalService).saveCsv();
+        if (confirmAction("Do you want to make a backup (yes/no)?: ")) {
+            new CsvSavingService(userService, vehicleService, rentalService).save();
             System.out.println("Data has been saved in .csv successfully!");
-            new JsonSavingService(userService, vehicleService, rentalService).saveJson();
+            new JsonSavingService(userService, vehicleService, rentalService).save();
             System.out.println("Data has been saved in .json successfully!");
         }
     }
