@@ -43,7 +43,7 @@ public class AdminVehiclePanel {
                     return true;
                 }
                 case 'q' -> {
-                    ifSave();
+                    ifSave(null, vehicleService, rentalService);
                     System.out.println("Logging out...");
                     return false;
                 }

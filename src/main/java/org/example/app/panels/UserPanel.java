@@ -11,6 +11,8 @@ import org.example.models.Vehicle;
 import java.util.ArrayList;
 import java.util.List;
 
+import static org.example.impls.services.GlobalSavingService.save;
+
 public class UserPanel {
     private final User user;
     private final VehicleRepoService vehicleService;
@@ -34,11 +36,11 @@ public class UserPanel {
             switch (operator) {
                 case '1' -> {
                     rentVehicle();
-                    new GlobalSavingService(vehicleService, rentalService).save();
+                    save(null, vehicleService, rentalService);
                 }
                 case '2' -> {
                     returnVehicle();
-                    new GlobalSavingService(vehicleService, rentalService).save();
+                    save(null, vehicleService, rentalService);
                 }
                 case '3' -> System.out.println(user);
                 case 'q' -> {

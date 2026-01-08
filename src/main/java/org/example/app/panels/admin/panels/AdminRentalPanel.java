@@ -47,7 +47,7 @@ public class AdminRentalPanel {
                     return true;
                 }
                 case 'q' -> {
-                    ifSave();
+                    ifSave(userService, vehicleService, rentalService);
                     System.out.println("Logging out...");
                     return false;
                 }

@@ -1,0 +1,3 @@
+Rental(id=2f2b5440-d4a3-467e-9d97-454a401d998b; userId=6ce5b9da-06ba-421b-bb58-0cd5d64efd99; vehicleId=73145636-8f97-4224-9aa3-cd4e869f1336; rentalDate=2025-04-22; expirationDate=2025-05-22)
+Rental(id=85c5945f-5ce9-4782-89ae-553c408e9608; userId=328417f0-b9ab-49f4-b273-cf75f5419471; vehicleId=964fea16-cbd0-4055-944b-4952f27fd5da; rentalDate=2025-04-24; expirationDate=2025-05-24)
+Rental(id=50caeb83-db7c-4b2b-bd78-2cc6d2cee43a; userId=73145636-8f97-4224-9aa3-cd4e869f1336; vehicleId=6ce5b9da-06ba-421b-bb58-0cd5d64efd99; rentalDate=2025-07-08; expirationDate=2025-07-09)

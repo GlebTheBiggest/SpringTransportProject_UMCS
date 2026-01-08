@@ -82,7 +82,7 @@ public class AdminPanel {
                 }
                 case 'u' -> System.out.println(USER.toString());
                 case 'q' -> {
-                    ifSave();
+                    ifSave(userService, vehicleService, rentalService);
                     System.out.println("Logging out...");
                     return;
                 }

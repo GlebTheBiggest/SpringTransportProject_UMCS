@@ -1,21 +1,24 @@
 <!DOCTYPE hibernate-configuration PUBLIC
         "-//Hibernate/Hibernate Configuration DTD 3.0//EN"
-        "http://hibernate.sourceforge.net/hibernate-configuration-3.0.dtd">
+        "http://www.hibernate.org/dtd/hibernate-configuration-3.0.dtd">
 <hibernate-configuration>
     <session-factory>
         <!-- PostgreSQL connection settings -->
         <property name="hibernate.connection.driver_class">org.postgresql.Driver</property>
         <property name="hibernate.connection.url">
-            jdbc:postgresql://ep-sparkling-scene-a49ibc59-pooler.us-east-1.aws.neon.tech:5432/neondb?sslmode=require
+            jdbc:postgresql://ep-sparkling-scene-a49ibc59-pooler.us-east-1.aws.neon.tech/neondb?sslmode=require
         </property>
         <property name="hibernate.connection.username">neondb_owner</property>
         <property name="hibernate.connection.password">npg_sFqUT1GMb0dg</property>
 
-        <!-- Hibernate behavior -->
+        <!-- JDBC settings -->
         <property name="hibernate.dialect">org.hibernate.dialect.PostgreSQLDialect</property>
         <property name="hibernate.hbm2ddl.auto">update</property>
         <property name="hibernate.show_sql">true</property>
         <property name="hibernate.format_sql">true</property>
+
+        <!-- Connection pool (you should replace with HikariCP or c3p0 in prod) -->
+        <property name="hibernate.connection.pool_size">5</property>
 
         <!-- Mapping entities -->
         <mapping class="org.example.models.User"/>
@@ -23,3 +26,8 @@
         <mapping class="org.example.models.Rental"/>
     </session-factory>
 </hibernate-configuration>
+
+
+
+
+

@@ -1,0 +1,4 @@
+Vehicle(id=96f6014f-5146-41bb-a7da-fe65f3bca72c; category=Bus; brand=Volkswagen; model=T2; year=1985; plate=LU123; price=100.0; attributes={seats=20})
+Vehicle(id=6ce5b9da-06ba-421b-bb58-0cd5d64efd99; category=Motorcycle; brand=Honda; model=CBR600; year=2016; plate=LU456; price=200.0; attributes={licence_category=A, drive=chain})
+Vehicle(id=171e4c97-586a-4e2f-aba3-9371ac1d292f; category=Car; brand=Toyota; model=Corolla; year=2024; plate=LU789; price=300.0; attributes={})
+Vehicle(id=328417f0-b9ab-49f4-b273-cf75f5419471; category=Tractor; brand=CAT; model=Ab538; year=2023; plate=ARC124; price=50900.0; attributes={was_in_use=true, needs_a_repairing=true})

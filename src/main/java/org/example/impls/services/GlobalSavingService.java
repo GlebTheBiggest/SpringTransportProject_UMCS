@@ -11,16 +11,8 @@ import static org.example.impls.services.input.InputService.confirmAction;
 
 @Data
 public class GlobalSavingService {
-    private static UserRepoService userService;
-    private static VehicleRepoService vehicleService;
-    private static RentalRepoService rentalService;
 
-    public GlobalSavingService(VehicleRepoService vehicleService, RentalRepoService rentalService) {
-        GlobalSavingService.vehicleService = vehicleService;
-        GlobalSavingService.rentalService = rentalService;
-    }
-
-    public void save() {
+    public static void save(UserRepoService userService, VehicleRepoService vehicleService, RentalRepoService rentalService) {
         if (userService != null && userService.getUserRepo() != null) {
             userService.getUserRepo().saveCsv();
             userService.getUserRepo().saveJson();
@@ -37,7 +29,7 @@ public class GlobalSavingService {
         }
     }
 
-    public static void ifSave() {
+    public static void ifSave(UserRepoService userService, VehicleRepoService vehicleService, RentalRepoService rentalService) {
         if (confirmAction("Do you want to make a backup (yes/no)?: ")) {
             new CsvSavingService(userService, vehicleService, rentalService).save();
             System.out.println("Data has been saved in .csv successfully!");

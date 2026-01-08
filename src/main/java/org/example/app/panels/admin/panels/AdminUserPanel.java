@@ -50,7 +50,7 @@ public class AdminUserPanel {
                     return true;
                 }
                 case 'q' -> {
-                    ifSave();
+                    ifSave(userService, null, rentalService);
                     System.out.println("Logging out...");
                     return false;
                 }

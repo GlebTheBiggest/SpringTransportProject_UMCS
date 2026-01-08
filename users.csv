@@ -1,0 +1,4 @@
+User(id=198d6f8b-8b5b-4d60-8968-28e97fc0f00c; name=gleb; password=$2a$10$W1aekKpCFsPmjAdthn7JOOep7PT5HMfMr5m6Kyp/ym4h63gFtrN1m; role=ADMIN)
+User(id=73145636-8f97-4224-9aa3-cd4e869f1336; name=bob; password=$2a$10$FOgwNiwfrC5NdwVL/6PPLeyRz79ipVwnq2Pxt5OkWVDoNg7L3MQ/q; role=USER)
+User(id=964fea16-cbd0-4055-944b-4952f27fd5da; name=bill; password=$2a$10$R3fR.ekLppqNBUG/Noyj2uBYMBUh5.qOujB/o87WxkTFc4qygZMCm; role=USER)
+User(id=5ee565ac-eb4a-4157-9a9f-622fd414fbe9; name=tod; password=$2a$10$WPVuPnkF3XbAYIKQynsulOD7mWUdIugFXgccg7gShu5IoWb5avdf2; role=USER)
